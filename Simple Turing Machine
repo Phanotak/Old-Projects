@@ -1,0 +1,290 @@
+package Turing;
+ 
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.*;
+ 
+class turing
+{
+    public static void  main( String[]  args )
+    {
+        turing  t = new turing();
+        t.cmdLoop();
+       
+    }
+       
+    final int MaxTapeLength = 1000;
+ 
+        char[]  tapeContents;
+        int currHeadPos;
+        int endOfTape;
+ 
+    public turing()
+    {
+        tapeContents = new char[MaxTapeLength];
+ 
+        // initialize tape to all spaces
+        for(int i = 0; i < MaxTapeLength; i++)
+        {
+            tapeContents[ i ] = ' ';
+        }
+ 
+        currHeadPos  = 0;
+        endOfTape    = 1;
+    }
+   
+    //Commands for program
+    public String cmdLoop()
+    {
+       
+        Scanner getReq = new Scanner( System.in );
+       
+        ArrayList<String>inputs = new ArrayList<String>();
+        String userInput;
+       
+        SecondMenu();
+            for( ; ; )
+            {
+               
+               
+ 
+                boolean flag = false;
+               
+               
+                do{
+                    userInput = getReq.next();
+                   
+                        if(userInput.equals("Begin")){
+                            flag = true;
+                        }else {
+                                if(flag == true){
+                                        if(userInput.equals("End")){
+                                            int i;
+                                            for(i = 0; i < inputs.size(); i++)
+                                                RunCmd(inputs.get(i));
+                                                flag = false;
+                                                break;
+                                           
+                                        }else{
+                                                inputs.add(userInput);
+                                        }
+                                }else{
+                                        RunCmd(userInput);
+                                        break;
+                                }
+                       
+                        }
+                   
+                }
+                while(true);   
+               
+            }
+           
+    }
+       
+    void RunCmd(String userInput)
+           
+    {       char command = userInput.charAt(0);        
+            say("");
+ 
+            if(command == '?')
+            {
+                dumpTape(currHeadPos, currHeadPos + 1);
+            }
+            else
+            if(command == '=')
+            {
+               
+                tapeContents[currHeadPos] = userInput.charAt(1);
+               
+                if( endOfTape == 0 )
+                {
+                    endOfTape++;
+                }else
+                if( userInput.charAt(1) != '0' && userInput.charAt(1) != '1')
+                {
+                    say ( "Invalid input. Enter '0' or '1'");
+                    tapeContents[ currHeadPos ] = ' ';
+                }
+            }
+            else
+            if( command == 'C' )
+            {
+                //use a space to signal 'empty' so that cells will print out ok
+                tapeContents[ currHeadPos ] = ' ';
+            }
+            else
+            if( command == 'L' )
+            {
+                if( tapeContents[ currHeadPos ] == ' ')
+                {
+                    say( "Cell has no input, unable to move LEFT");
+                   
+                }
+                else
+                if( currHeadPos == 0 )
+                {
+                    say( "" );
+                    say( "Tape rewound, unable to move LEFT" );
+                }
+                else
+                {
+                    currHeadPos--;
+                }
+            }
+            else
+            if( command == 'R' )
+            {
+                if( tapeContents[ currHeadPos ] == ' ')
+                {
+                    say( "Cell has no input, unable to move Right");
+                   
+                }else
+                if( tapeContents[ currHeadPos ] == '0' || tapeContents[ currHeadPos ] == '1'){
+                    currHeadPos++;
+                    endOfTape++;
+                }
+            }
+            else
+            if( command == 'B' )
+            {
+                currHeadPos = 0;
+            }
+            else
+            if( command == 'D' )
+            {
+                dumpTape( 0, endOfTape );
+            }
+            else
+            if( command == 'X' )
+            {
+                System.exit( 0 );
+            }
+            else
+            if ( command == 'S')
+            {
+                SecondMenu();
+            }
+            else
+            if ( userInput.charAt(0) == 'T' ){
+               
+                String[] strarr= userInput.split(",");
+                //for(String s: strarr){
+                //        System.out.println(s);
+                //    }
+                userInput = strarr[0];
+                String zero = strarr[1];
+                String one = strarr[2];
+                if ( tapeContents[currHeadPos] == '0'){
+                    RunCmd(zero);
+                }else
+                if ( tapeContents[currHeadPos] == '1'){
+                    RunCmd(one);
+                }
+               
+            }
+            else
+            if ( command == 'E'){
+                currHeadPos = endOfTape - 1;
+            }
+            else
+            if ( command == '#'){
+               
+                String fileName = "";
+                String line = null;
+ 
+                try {                  
+                    FileReader fileReader = new FileReader("Your Directory Here");
+                    BufferedReader bufferedReader = new BufferedReader(fileReader);
+ 
+                    while((line = bufferedReader.readLine()) != null) {
+                        RunCmd(line);
+//                      System.out.println(line);
+                    }  
+                    bufferedReader.close();        
+                }
+                catch(FileNotFoundException ex) {
+                    System.out.println(
+                        "Unable to open file '" +
+                        fileName + "'");                
+                }
+                catch(IOException ex) {
+                    System.out.println(
+                        "Error reading file '"
+                        + fileName + "'");                  
+                   
+                }
+            }
+           
+        }
+   
+   
+   
+    public void  dumpTape(int startPos, int endPos)
+    {
+        String[]outRows = new String[ 5 ];
+ 
+        for(int i = startPos; i < endPos; i++)
+        {
+            // output max ten positions per row
+            if( ( i - startPos ) % 10 == 0 )
+            {
+                if( i != startPos )
+                {
+                    for( int row = 0; row < 3; row++)
+                    {
+                        say(outRows[row]);
+                    }
+                }
+ 
+                outRows[ 0 ] = "POS |";
+                outRows[ 1 ] = "    +";
+                outRows[ 2 ] = "VAL |";
+ 
+                say( "" );
+            }
+       
+            outRows[ 0 ] += " " + String.format( "%3d", i ) + " |";
+            outRows[ 1 ] += "-----+";
+            outRows[ 2 ] += "  " + Character.toString( tapeContents[ i ] ) + "  |";
+ 
+            if( i == endPos - 1 )
+            {
+                for( int  row = 0; row < 3; row++ )
+                {
+                    say( outRows[ row ] );
+                }
+            }
+        }
+    }
+ 
+    public void  postMenu()
+    {  
+        say( "\tS\tenter single input"                );
+        say( "" );
+        say( "Enter command:" );
+    }
+ 
+    public void SecondMenu()
+    {
+        say( "\t?\tprint current cell"                );
+        say( "\t=\tassign new symbol to current cell" );
+        say( "\tC\tclear current cell"                );
+        say( "\tL\tmove head to left"                 );
+        say( "\tR\tmove head to right"                );
+        say( "\tB\trewind to beginning of tape"       );
+        say( "\tD\tdump contents of tape"             );
+        say( "\tT\tset Transition commands"           );
+        say( "\tE\tmove header to end of inputs"      );
+        say( "\t#\timport file"                       );
+        say( "\tX\texit program"                      );
+    }
+   
+    public void  say( String  s )
+    {
+        System.out.println( s );
+    }
+ 
+}
