@@ -1,0 +1,73 @@
+public class QueensAlgorithmAllSolution {
+
+	private int[] queensArray;
+	private int numofQueens;
+	private static int numsolutions = 0;
+	private static long startTime = System.nanoTime();
+	
+	public static void main(String[] args) {
+
+		QueensAlgorithmAllSolution queensproblem = new QueensAlgorithmAllSolution(15);
+		queensproblem.solveQueensAlgorithmAllSolution();
+
+		long endTime = System.nanoTime();
+		System.out.println("Took "+(endTime - startTime) + " ns"); 
+	}
+	
+	public QueensAlgorithmAllSolution(int numofQueens) {
+		queensArray = new int[numofQueens];
+		this.numofQueens = numofQueens;
+	}
+	
+	public void solveQueensAlgorithmAllSolution() {
+		arrangeQueens(0);
+	}
+	
+	private void arrangeQueens(int row) {
+		
+		for(int i = 0; i < numofQueens; i++) {
+			if(isPlaceValid(row, i)) {
+				queensArray[row] = i;
+				if(row == numofQueens - 1) {
+					printQueens();
+				}else {
+					arrangeQueens(row + 1);
+				}
+			}
+		}
+	}
+	private void printQueens() {
+		
+//		System.out.println("\n\nSolution " + (++numsolutions));
+		for(int i = 0; i < numofQueens; i++) {
+			for (int j = 0; j < numofQueens; j++) {
+				if(queensArray[i] == j) {
+					System.out.print(" 1 ");
+				}else {
+					System.out.print(" 0 ");
+				}
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+	
+	private boolean isPlaceValid(int row, int column) {
+		
+		for(int i = 0; i < row; i++) {
+			if(queensArray[i] == column){
+				return false;
+			}
+			if((i - row) == (queensArray[i] - column)) {
+				return false;
+			}
+			
+			if((i - row) == (column - queensArray[i])){
+				return false;
+			}
+			
+		}
+		return true;
+	}
+	
+}
